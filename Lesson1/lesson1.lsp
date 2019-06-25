@@ -10,29 +10,31 @@
 ;; 2 task
 
 (defun inc-lst (lst)
-  (let ((result))
-    (dolist (x lst (reverse result))
-      (push (1+ x) result))))
+  (if (null lst)
+      nil
+      (cons (1+ (car lst)) (inc-lst (cdr lst)))))
 
 ;; 3 task
 
 (defun my-reverse (lst)
+  (my-reverse-helper lst nil))
+
+(defun my-reverse-helper (lst result)
   (if (null lst)
-      nil
-      (append (my-reverse (cdr lst)) (list (car lst)))))
+      result
+      (my-reverse-helper (cdr lst) (cons (car lst) result))))
 
 ;; 4 task
 
-(defun delete-repeats-helper (item lst)
-  "This function deletes all occurences of item in lst"
-  (if (< (count item lst) 1)
-      lst
-      (delete-repeats-helper item (remove item lst))))
+(defun delete-repeats-helper (item result)
+  (if (find item result)
+      result
+      (cons item result)))
 
 (defun delete-repeats (lst)
-  (if (null lst)
-      lst
-      (cons (car lst) (delete-repeats (delete-repeats-helper (car lst) (cdr lst))))))
+  (let ((result))
+    (dolist (item lst (reverse result))
+      (setf result (delete-repeats-helper item result)))))
 
 ;;; TESTS
 ;; 1 task
