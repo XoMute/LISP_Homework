@@ -10,9 +10,7 @@
 ;; 2 task
 
 (defun inc-lst (lst)
-  (if (null lst)
-      nil
-      (cons (1+ (car lst)) (inc-lst (cdr lst)))))
+  (when lst (cons (1+ (car lst)) (inc-lst (cdr lst)))))
 
 ;; 3 task
 
@@ -26,15 +24,14 @@
 
 ;; 4 task
 
-(defun delete-repeats-helper (item result)
-  (if (find item result)
-      result
-      (cons item result)))
+(defun delete-repeats-helper (lst result)
+  (let ((item (car lst)))
+    (cond ((null lst) result)
+	  ((find item result) (delete-repeats-helper (cdr lst) result))
+	  (T (delete-repeats-helper (cdr lst) (cons item result))))))
 
 (defun delete-repeats (lst)
-  (let ((result))
-    (dolist (item lst (reverse result))
-      (setf result (delete-repeats-helper item result)))))
+  (reverse (delete-repeats-helper lst nil)))
 
 ;;; TESTS
 ;; 1 task
