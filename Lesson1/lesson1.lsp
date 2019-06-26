@@ -24,10 +24,14 @@
 
 ;; 4 task
 
+(defun my-find (item lst)
+  "Method to also find nils in list"
+  (numberp (position item lst)))
+
 (defun delete-repeats-helper (lst result)
   (let ((item (car lst)))
     (cond ((null lst) result)
-	  ((find item result) (delete-repeats-helper (cdr lst) result))
+	  ((my-find item result) (delete-repeats-helper (cdr lst) result))
 	  (T (delete-repeats-helper (cdr lst) (cons item result))))))
 
 (defun delete-repeats (lst)
@@ -97,7 +101,8 @@
   (test-delete-repeats "delete-repeats-2" '(2 2 2 2 2 2 2) '(2))
   (test-delete-repeats "delete-repeats-3" '(1 2 3 4 5) '(1 2 3 4 5))
   (test-delete-repeats "delete-repeats-4" '(1 1 1 2 2 1 3 3 2 3 1) '(1 2 3))
-  (test-delete-repeats "delete-repeats-5" nil nil))
+  (test-delete-repeats "delete-repeats-5" nil nil)
+  (test-delete-repeats "delete-repeats-6" '(nil nil nil) '(nil)))
 
 ;;;;
 
