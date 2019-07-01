@@ -17,8 +17,102 @@
 (defun create-difference (set1 set2)
   (lambda (elem)
     (not (and (funcall set1 elem)
-	      (funcall set2 elem)))))
-    
+	     (funcall set2 elem)))))
+
+;; 2 task
+
+;; TODO: implement this functions
+
+(defun bubble-sort (lst) lst)
+
+(defun insertion-sort (lst) lst)
+
+(defun selection-sort (lst) lst)
+
+;;------------------------
+
+(defun bubble-sort-imperative (lst)
+  (let ((len (1- (length lst))))
+    (dotimes (i len lst)
+      (dotimes (j (- len i))
+	(when (> (nth j lst) (nth (1+ j) lst))
+	  (rotatef (nth j lst) (nth (1+ j) lst)))))))
+	   
+(defun insertion-sort-imperative (lst)
+  (let ((len (length lst)))
+    (loop
+      for i from 1 to (1- len)
+      do
+	 (let ((key (nth i lst))
+	       (j (1- i)))
+	   (loop
+	     repeat (1+ j)
+	     do
+		(when (> (nth j lst) key)
+		  (setf (nth (1+ j) lst) (nth j lst)))
+	     unless (> (nth j lst) key)
+	       do (return)
+	     do (decf j))
+	   (setf (nth (1+ j) lst) key))))
+  lst)
+
+(defun selection-sort-imperative (lst)
+  (let ((len (1- (length lst))))
+    (dotimes (i len)
+      (let ((min-index i))
+	(loop for j from (1+ i) to len
+	      do
+		 (when (< (nth j lst) (nth min-index lst))
+		   (setf min-index j)))
+	(rotatef (nth min-index lst) (nth i lst)))))
+  lst)
+
+;; 3 task
+
+(defun gen-my-sum ()
+  (let ((sum 0))
+    (lambda (x)
+      (incf sum x))))
+
+;; 4 task
+
+(defun create-eraser (k)
+  (lambda (lst)
+    (labels ((%helper (acc lst)
+	       (let ((item (car lst)))
+		 (cond ((null lst) (reverse acc))
+		       ((and (>= (count item lst) k)
+			     (not (member item acc)))
+			(%helper (cons item acc) (cdr lst)))
+		       (t (%helper acc (cdr lst)))))))
+      (%helper nil lst))))
+
+;; 5 task
+
+(defun num-orders (lst)
+  (labels ((%fact (n)
+	     (if (< n 2) 1 (* n (%fact (1- n)))))
+	   (%fact-of-sums (lst)
+	     (%fact (reduce #'+ lst)))
+	   (%application-of-facts (lst)
+	     (reduce #'* lst :key #'%fact)))
+    (if lst
+	(/ (%fact-of-sums lst) (%application-of-facts lst))
+	0)))
+				    
+
+;; 6 task
+
+(defun quicksort (lst)
+  (when lst
+    (let ((pivot (car lst))
+	  (tail (cdr lst)))
+      (append (quicksort
+	       (remove-if (lambda (x) (> x pivot)) tail))
+	      (list pivot)
+	      (quicksort
+	       (remove-if (lambda (x) (<= x pivot)) tail))))))
+
 ;; TESTS
 ;; 1 task
 
@@ -79,6 +173,12 @@
   (test-create-difference "create-difference-2" '((10 12 14) (11 14 12)) 12 nil)
   (test-create-difference "create-difference-3" '((10 12 14) (11 14 12)) 14 nil))
 
+(defun run-all-set-tests ()
+  (run-create-set-tests)
+  (run-create-union-tests)
+  (run-create-intersect-tests)
+
+  (run-create-difference-tests))
 ;; 2 task
 
 (defun check-sort (func input expected)
@@ -100,7 +200,7 @@
 ;; 3 task
 
 (defun check-gen-my-sum (input expected)
-  (let ((result (gen-my-sum input)))
+  (let ((result (mapcar (gen-my-sum) input)))
     (equal result expected)))
 
 (defun test-gen-my-sum (name input expected)
@@ -124,7 +224,7 @@
 (defun run-eraser-tests ()
   (test-eraser "eraser-1" '(1 2 3 3 2 3 a a c a a a) 3 '(3 a))
   (test-eraser "eraser-2" '(1 1 1 1 1 1 1 1 1 1 1 1) 1 '(1))
-  (test-eraser "eraser-3" '(1 2 3 nil nil 3 a nil c nil a a) 3 '(3 a nil)))
+  (test-eraser "eraser-3" '(1 2 3 3 nil nil 3 a nil c nil a a) 3 '(3 nil a)))
 
 ;; 5 task
 
@@ -139,8 +239,9 @@
 (defun run-num-orders-tests ()
   (test-num-orders "num-orders-1" nil 0)
   (test-num-orders "num-orders-2" '(1 1) 2)
-  (test-num-orders "num-orders-2" '(1 2) 3)
-  (test-num-orders "num-orders-2" '(1 1 1) 6))
+  (test-num-orders "num-orders-3" '(1 2) 3)
+  (test-num-orders "num-orders-4" '(1 1 1) 6)
+  (test-num-orders "num-orders-5" '(1 1 3) 20))
 
 ;; 6 task
 
@@ -152,6 +253,16 @@
   (or (check-qsort input expected)
       (format T "~A failed.~%" name)))
 
-(defun run-tests-qsort ()
+(defun run-qsort-tests ()
   (test-qsort "quicksort-1" '(0 1 9 5 8 3 2) '(0 1 2 3 5 8 9))
   (test-qsort "quicksort-2" '(0 0 0 0 0 0 0 -1) '(-1 0 0 0 0 0 0 0)))
+
+;;------------------------------
+
+(defun run-all-tests ()
+  (run-all-set-tests)
+  (run-sort-tests)
+  (run-gen-my-sum-tests)
+  (run-eraser-tests)
+  (run-num-orders-tests)
+  (run-qsort-tests))
