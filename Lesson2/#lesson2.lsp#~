@@ -21,77 +21,50 @@
 
 ;; 2 task
 
-(defun bubble-sort (lst &key (key #'<))
-  (labels ((%is-sorted-p (lst)
-	     (cond ((null (cdr lst)) t)
-		   ((funcall key (car lst) (cadr lst)) (%is-sorted-p (cdr lst)))
-		   (t nil)))
-	   (%helper (lst)
-	     (cond ((null (cdr lst)) lst)
-		   ((funcall key (car lst) (cadr lst)) (cons (car lst) (%helper (cdr lst))))
-		   (t (cons (cadr lst) (%helper (cons (car lst) (cddr lst))))))))
-  (cond ((null lst) lst)
-	((%is-sorted-p lst) lst)
-	(t (bubble-sort (%helper lst) :key key)))))
-  
-(defun insertion-sort (lst &key (key #'<))
-  (labels ((%insert (item lst)
-	     (cond ((null lst) (list item))
-		   ((funcall key item (car lst)) (cons item lst))
-		   (t (cons (car lst) (%insert item (cdr lst)))))))
-    (when lst (%insert (car lst) (insertion-sort (cdr lst))))))
- 
-(defun selection-sort (lst &key (key #'<))
-  (labels ((%helper (lst)
-	     (when lst
-	       (let ((item (reduce (lambda (acc item) (if (funcall key item acc) item acc)) lst)))
-		 (cons item (%helper (remove item lst :count 1)))))))
-    (%helper lst)))
-
-;;------------------------
-
 (defun bubble-sort-imperative (lst)
   (let ((len (1- (length lst))))
     (dotimes (i len lst)
       (dotimes (j (- len i))
-	(when (> (nth j lst) (nth (1+ j) lst))
-	  (rotatef (nth j lst) (nth (1+ j) lst)))))))
-	   
+	(let* ((a (nth j lst))
+	       (b (nth (1+ j) lst))
+	       (buf a))
+	  (when (> a b)
+	    (setf (nth j lst) b)
+	    (setf (nth (1+ j) lst) buf)))))))
+
 (defun insertion-sort-imperative (lst)
   (let ((len (length lst)))
     (loop
       for i from 1 to (1- len)
       do
-	 (let ((key (nth i lst))
-	       (j (1- i)))
+	 (let ((key (nth i lst)))
 	   (loop
-	     repeat (1+ j)
+	     for j from (1- i) downto 0
 	     do
 		(when (> (nth j lst) key)
 		  (setf (nth (1+ j) lst) (nth j lst)))
 	     unless (> (nth j lst) key)
-	       do (return)
-	     do (decf j))
-	   (setf (nth (1+ j) lst) key))))
+	       do (setf (nth (1+ j) lst) key)
+		  (return)))))
   lst)
 
 (defun selection-sort-imperative (lst)
-  (let ((len (1- (length lst))))
-    (dotimes (i len)
+  (let ((len (length lst)))
+    (dotimes (i (1- len))
       (let ((min-index i))
 	(loop for j from (1+ i) to len
 	      do
-		 (when (< (nth j lst) (nth min-index lst))
-		   (setf min-index j)))
-	(rotatef (nth min-index lst) (nth i lst)))))
-  lst)
+		 (when (< (nth j lst) (nth min-index
+		  
+	  
 
 ;; 3 task
 
 (defun gen-my-sum ()
-  (let ((sum 0))
-    (lambda (x)
-      (incf sum x))))
+  (setf *sum* 0)
+  (lambda (x)
+    (incf *sum* x)
+    *sum*))
 
 ;; 4 task
 
@@ -108,29 +81,7 @@
 
 ;; 5 task
 
-(defun num-orders (lst)
-  (labels ((%fact (n)
-	     (if (< n 2) 1 (* n (%fact (1- n)))))
-	   (%fact-of-sums (lst)
-	     (%fact (reduce #'+ lst)))
-	   (%application-of-facts (lst)
-	     (reduce #'* lst :key #'%fact)))
-    (if lst
-	(/ (%fact-of-sums lst) (%application-of-facts lst))
-	0)))
-				    
-
-;; 6 task
-
-(defun quicksort (lst)
-  (when lst
-    (let ((pivot (car lst))
-	  (tail (cdr lst)))
-      (append (quicksort
-	       (remove-if (lambda (x) (> x pivot)) tail))
-	      (list pivot)
-	      (quicksort
-	       (remove-if (lambda (x) (<= x pivot)) tail))))))
+(defun num-orders (lst) lst)
 
 ;; TESTS
 ;; 1 task
@@ -157,7 +108,7 @@
   (let ((result (funcall (create-union (create-set (first input)) (create-set (second input))) item)))
     (eq result expected)))
 
-(defun test-create-union (name input item expected)
+(defun test-create-uniopn (name input item expected)
   (or (check-create-union input item expected)
       (format T "~A failed.~%" name)))
 
@@ -258,9 +209,8 @@
 (defun run-num-orders-tests ()
   (test-num-orders "num-orders-1" nil 0)
   (test-num-orders "num-orders-2" '(1 1) 2)
-  (test-num-orders "num-orders-3" '(1 2) 3)
-  (test-num-orders "num-orders-4" '(1 1 1) 6)
-  (test-num-orders "num-orders-5" '(1 1 3) 20))
+  (test-num-orders "num-orders-2" '(1 2) 3)
+  (test-num-orders "num-orders-2" '(1 1 1) 6))
 
 ;; 6 task
 
