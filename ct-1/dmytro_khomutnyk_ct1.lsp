@@ -17,14 +17,14 @@
 		 
 ;; 2 task
 
-(defun print-tree (tree)
-  "Returns tree as s-expr"
+(defun print-tree (tree &optional (stream t))
+  "prints tree as s-expr"
   (labels ((%helper (node)
 	     "Recursive function to 'print' each node with its childs"
 	     (if (node-p node)
 		 (cons (node-value node) (mapcar #'%helper (node-childs node)))
 		 node)))
-    (%helper tree)))
+    (format stream "~A" (%helper tree))))
   
 ;; 3 task
 
@@ -81,7 +81,7 @@
 ;; 1-2 tasks
 
 (defun check-create-tree (input expected)
-  (let ((result (print-tree (create-tree input))))
+  (let ((result (print-tree (create-tree input) nil)))
     (equal result expected)))
 
 
@@ -90,10 +90,10 @@
       (format t "~A failed.~%" name)))
 
 (defun run-create-tree-tests ()
-  (test-create-tree "create-tree-1" '(1 2 3) '(1 2 3))
-  (test-create-tree "create-tree-2" '(+ 1 2 (- 3 4)) '(+ 1 2 (- 3 4)))
-  (test-create-tree "create-tree-3" nil '(nil))
-  (test-create-tree "create-tree-4" '(+ 1 2 (* 3 4 5) (- 10 2)) '(+ 1 2 (* 3 4 5) (- 10 2))))
+  (test-create-tree "create-tree-1" '(1 2 3) "(1 2 3)")
+  (test-create-tree "create-tree-2" '(+ 1 2 (- 3 4)) "(+ 1 2 (- 3 4))")
+  (test-create-tree "create-tree-3" nil "(NIL)")
+  (test-create-tree "create-tree-4" '(+ 1 2 (* 3 4 5) (- 10 2)) "(+ 1 2 (* 3 4 5) (- 10 2))"))
 
 ;; 3 task
 
@@ -146,7 +146,7 @@
 ;; 6 task
 
 (defun check-map-tree (input trav key expected)
-  (let ((result (print-tree (map-tree (create-tree input) trav :key key))))
+  (let ((result (print-tree (map-tree (create-tree input) trav :key key) nil)))
     (equal result expected)))
 
 (defun test-map-tree (name input trav key expected)
@@ -154,10 +154,10 @@
       (format t "~A failed.~%" name)))
 
 (defun run-map-tree-tests ()
-  (test-map-tree "map-tree-1" '(+ 1 2 (* 3 4 5)) #'dfs-pre-order #'identity '(+ 1 2 (* 3 4 5)))
-  (test-map-tree "map-tree-2" '(+ 1 2 (* 3 4 5)) #'dfs-pre-order #'1+ '(+ 2 3 (* 4 5 6)))
-  (test-map-tree "map-tree-3" '(+ 1 2 (* 3 4 5)) #'dfs-post-order #'1- '(0 1 (2 3 4 *) +))
-  (test-map-tree "map-tree-4" '(+ 1 2 (* 3 4 5)) #'bfs (lambda (x) (* x x)) '(+ 1 4 * (9 16 25))))
+  (test-map-tree "map-tree-1" '(+ 1 2 (* 3 4 5)) #'dfs-pre-order #'identity "(+ 1 2 (* 3 4 5))")
+  (test-map-tree "map-tree-2" '(+ 1 2 (* 3 4 5)) #'dfs-pre-order #'1+ "(+ 2 3 (* 4 5 6))")
+  (test-map-tree "map-tree-3" '(+ 1 2 (* 3 4 5)) #'dfs-post-order #'1- "(0 1 (2 3 4 *) +)")
+  (test-map-tree "map-tree-4" '(+ 1 2 (* 3 4 5)) #'bfs (lambda (x) (* x x)) "(+ 1 4 * (9 16 25))"))
 
 ;; 7 task
 
